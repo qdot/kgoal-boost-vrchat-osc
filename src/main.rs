@@ -7,7 +7,7 @@ use tokio::net::{UdpSocket};
 use rosc::{OscMessage, OscPacket, OscType, encoder};
 use futures_util::StreamExt;
 use btleplug::api::{
-    bleuuid::uuid_from_u16, Central, Manager as _, Peripheral as _, ScanFilter, WriteType,
+    Central, Manager as _, Peripheral as _, ScanFilter,
 };
 use btleplug::platform::{Adapter, Manager, Peripheral};
 use uuid::Uuid;
@@ -46,7 +46,6 @@ async fn main() {
     // start scanning for devices
     central.start_scan(ScanFilter::default()).await.unwrap();
     // instead of waiting, you can use central.events() to get a stream which will
-    // notify you of new devices, for an example of that see examples/event_driven_discovery.rs
     tokio::time::sleep(std::time::Duration::from_secs(2)).await;
 
     // find the device we're interested in
@@ -66,13 +65,9 @@ async fn main() {
         .expect("Unable to find characterics");
     println!("Got Chracteristic");
 
+    // Assign random high port here.
     let host_addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 25172);
     let socket = UdpSocket::bind(&host_addr).await.unwrap();
-    let msg_buf = encoder::encode(&OscPacket::Message(OscMessage {
-        addr: "/avatar/parameters/Squeeze".to_string(),
-        args: vec![OscType::Float(0.99f32)],
-    }))
-    .unwrap();
     println!("Generated message.");
 
     boost.subscribe(cmd_char).await.unwrap();
